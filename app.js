@@ -4,7 +4,7 @@ const app=express();
 const bodyParser=require("body-parser");
 const router=express.Router(); 
 app.use(bodyParser.urlencoded({extended:true}));
-app.use(bodyParser.json());
+app.use(bodyParser.json()); 
 const multer = require('multer');//for multi-part data handling
 app.use(multer);
 //handling CORS error

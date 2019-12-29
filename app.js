@@ -1,12 +1,16 @@
 
 const express=require("express");
 const app=express();
-const bodyParser=require("body-parser");
-const router=express.Router(); 
-app.use(bodyParser.urlencoded({extended:true}));
-app.use(bodyParser.json()); 
-const multer = require('multer');//for multi-part data handling
-app.use(multer);
+const router=express.Router();
+const multer = require('multer');
+
+//const bodyParser=require("body-parser");
+
+/* app.use(bodyParser.urlencoded({extended:true}));
+app.use(bodyParser.json()); */
+
+
+
 //handling CORS error
 app.use((req,res,next)=>{
 res.header("Accss-Control-Allow-Origin","*"),
@@ -39,10 +43,10 @@ app.post("/NGO_event_organised",NGO.event_organised);
 app.post("/add_NGO_future_event",NGO.add_future_event);
 app.post("/add_NGO_subscribers",NGO.add_subs);
 app.post("/add_NGO_notifications",NGO.add_noti);
-app.post("/add_event_organised_photo",NGO.add_event_organised_photo);
+app.post("/add_event_organised_photo",NGO.add_event_organised_photo,NGO.after_upload_event_organized_photo);
 app.post("/add_NGO_event_organised",NGO.add_event_organised);
 
-
+//module.exports=multer;
 module.exports=router;
 
 app.listen(3000,()=>console.log("Express server running at port no : 3000"));

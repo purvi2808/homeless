@@ -1,8 +1,32 @@
 var config=require("../../databaseConfig");
 var mysqlConnection=config.mysqlConnection;
- var multer = require('multer');
+const multer = require('multer');//for multipart data handling
+const storage1=multer.diskStorage({
+    destination:function(req,file,cb){
+        cb(null,"./static/event_organised/");
+    },
+    filename:function(req,file,cb){
+        var name=new Date().toISOString()+file.originalname;
+        name=name.split(":");
+        newName=name[0];
+        for(var i=1;i<name.length;i++){
+            newName=newName+name[i];
+        }
+        cb(null,newName);
+    }
+});
+ const storage2=multer.diskStorage({
+    destination:function(req,file,cb){
+        cb(null,"./static/event_organised/");
+    },
+    filename:function(req,file,cb){
+        cb(null,new Date().toISOString()+file.originalname);
+    }
+}); 
+var event_organised_upload=multer({storage:storage1});
+var future_event_upload=multer({storage:storage2});
 
-
+exports.add_event_organised_photo=event_organised_upload.single("photo");
 
 exports.register=function(req,res){
     //console.log("purvi");
@@ -26,6 +50,7 @@ exports.register=function(req,res){
 };
 
 exports.login=function(req,res){
+    console.log(req.body);
     mysqlConnection.query("select * from NGO_register where unique_id='"+req.body.unique_id+"'",(err,results,fields)=>{
         if (err) {
             res.send({
@@ -189,24 +214,9 @@ exports.add_noti=function(req,res){
     });
 };
 
-exports.add_event_organised_photo=function(req,res){
-    
-        photo=req.body.photo;
-      var path=require("path");
-      var dir = path.join(__dirname,"../../static/event_organised/");
-      var storage = multer.diskStorage({
-        destination: function (req, photo, callback) {
-          callback(null, 'dir')
-        },
-        filename: function (req, photo, callback) {
-            dir=dir+photo.fieldname + '-' + Date.now()
-          callback(null, dir)
-        }
-      })
-       
-      var upload = multer({ storage: storage })
-
-      mysqlConnection.query("insert into event_organised_photo value(null,'"+"','"+req.body.event_id+"','"+dir+"')",(err,results,fields)=>{
+exports.after_upload_event_organized_photo=function(req,res){
+        console.log(req.body);
+      mysqlConnection.query("insert into event_organised_photo value(null,'"+req.body.event_id+"','"+req.file.path+"')",(err,results,fields)=>{
         if(err){
             res.send({
                 "status":400,
@@ -221,7 +231,7 @@ exports.add_event_organised_photo=function(req,res){
         }
     });
     
-};
+}; 
 
 exports.add_event_organised=function(req,res){
     mysqlConnection.query("insert into NGO_future_event value(null,'"+req.body.unique_id+
